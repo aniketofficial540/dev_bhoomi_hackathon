@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Query Page</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            width: 100vw;
+            height: 100vh;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .options {
+            width: 80%;
+            max-width: 500px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            border: none;
+            background: #007bff;
+            color: white;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:hover {
+            background: #0056b3;
+            transform: scale(1.02);
+        }
+
+        .btn.selected {
+            background: #0056b3;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            width: 80%;
+            max-width: 500px;
+            margin-top: 20px;
+        }
+
+        .nav-btn {
+            width: 48%;
+            padding: 12px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: #5a6268;
+        }
+
+        .nav-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Summary Page Styling */
+        .summary-container {
+            width: 80%;
+            max-width: 600px;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .summary-container h2 {
+            font-size: 26px;
+            margin-bottom: 15px;
+            color: #007bff;
+        }
+
+        .summary-list {
+            list-style: none;
+            text-align: left;
+            padding: 0;
+        }
+
+        .summary-list li {
+            background: #f8f9fa;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .summary-list li strong {
+            color: #333;
+        }
+
+        .summary-btns {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .restart-btn,
+        .submit-btn {
+            width: 48%;
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .restart-btn {
+            background: #dc3545;
+            color: white;
+        }
+
+        .restart-btn:hover {
+            background: #c82333;
+        }
+
+        .submit-btn {
+            background: #28a745;
+            color: white;
+        }
+
+        .submit-btn:hover {
+            background: #218838;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+    <script>
+        const questions = [
+            { text: "Education", options: ["High School", "Bachelor's", "Master's", "PhD"] },
+            { text: "Domicile", options: ["Asia", "Europe", "North America", "Other"] },
+            { text: "Interest", options: ["Artificial Intelligence", "Blockchain", "Web Development", "Cybersecurity"] },
+            { text: "Status", options: ["Student", "Working Professional", "Freelancer", "Entrepreneur"] }
+        ];
+
+        let step = 0;
+        let answers = new Array(questions.length).fill(null);
+
+        function loadQuestion() {
+            if (step >= questions.length) {
+                showSummary();
+                return;
+            }
+
+            const questionData = questions[step];
+            document.getElementById("question-text").innerText = questionData.text;
+
+            const optionsContainer = document.getElementById("options");
+            optionsContainer.innerHTML = "";
+
+            questionData.options.forEach(option => {
+                const button = document.createElement("button");
+                button.innerText = option;
+                button.className = "btn";
+                button.onclick = () => selectOption(option);
+                if (answers[step] === option) {
+                    button.classList.add("selected"); // Highlight selected option
+                }
+                optionsContainer.appendChild(button);
+            });
+
+            document.getElementById("prevBtn").disabled = step === 0; // Disable 'Previous' on first step
+        }
+
+        function selectOption(option) {
+            answers[step] = option;
+            nextQuestion();
+        }
+
+        function nextQuestion() {
+            if (step < questions.length - 1) {
+                step++;
+                loadQuestion();
+            } else {
+                showSummary();
+            }
+        }
+
+        function prevQuestion() {
+            if (step > 0) {
+                step--;
+                loadQuestion();
+            }
+        }
+
+        function showSummary() {
+            let summaryHTML = `
+                <div class="summary-container">
+                    <h2>Summary of Your Responses</h2>
+                    <ul class="summary-list">
+            `;
+
+            questions.forEach((q, index) => {
+                summaryHTML += `<li><strong>${q.text}</strong>: ${answers[index]}</li>`;
+            });
+
+            summaryHTML += `
+                    </ul>
+                    <div class="summary-btns">
+                        <button class="restart-btn" onclick="restart()">Restart</button>
+                        <button class="submit-btn" onclick = "handleSubmit()">Submit</button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById("question-card").innerHTML = summaryHTML;
+        }
+
+        function restart() {
+            step = 0;
+            answers = new Array(questions.length).fill(null);
+            loadQuestion();
+        }
+
+        function handleSubmit() {
+            window.location.href = "/"
+        }
+
+        window.onload = loadQuestion;
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <div id="question-card">
+            <h2 id="question-text"></h2>
+            <div id="options" class="options"></div>
+            <div class="navigation">
+                <button id="prevBtn" class="nav-btn" onclick="prevQuestion()">Previous</button>
+                <button id="nextBtn" class="nav-btn" onclick="nextQuestion()">Next</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quizzes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .quiz-topics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .quiz-topic {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            flex: 1 1 calc(33.333% - 40px);
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .quiz-topic:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .quiz-topic h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #007bff;
+        }
+
+        .quiz-topic p {
+            font-size: 16px;
+            color: #555;
+        }
+
+        .quiz-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+        }
+
+        .quiz-container h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .question {
+            margin-bottom: 20px;
+        }
+
+        .question h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .option:hover {
+            background: #e9ecef;
+        }
+
+        .option.correct {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+        }
+
+        .option.incorrect {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+
+        .result {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .result.correct {
+            color: #28a745;
+        }
+
+        .result.incorrect {
+            color: #dc3545;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #0056b3;
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .final-report {
+            margin-top: 20px;
+        }
+
+        .final-report h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .final-report ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .final-report li {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            font-size: 16px;
+            color: #555;
+        }
+
+        .final-report li.correct {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+        }
+
+        .final-report li.incorrect {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .quiz-topic {
+                flex: 1 1 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quizzes</h1>
+
+
+        <!-- Quiz Container -->
+        <div class="quiz-container" id="quiz-container">
+            <h2 id="quiz-title">Select a Quiz Topic</h2>
+            <div id="quiz-content">
+                <p>Please select a topic from above to start the quiz.</p>
+            </div>
+        </div>
+    </div>
+        <!-- Quiz Topics -->
+        <div class="quiz-topics">
+            <div class="quiz-topic" onclick="loadQuiz('network-security')">
+                <h2>Network Security</h2>
+                <p>Test your knowledge of network security fundamentals.</p>
+            </div>
+            <div class="quiz-topic" onclick="loadQuiz('ethical-hacking')">
+                <h2>Ethical Hacking</h2>
+                <p>Explore ethical hacking techniques and tools.</p>
+            </div>
+            <div class="quiz-topic" onclick="loadQuiz('cryptography')">
+                <h2>Cryptography</h2>
+                <p>Learn about encryption and secure communication.</p>
+            </div>
+        </div>
+
+        <!-- Quiz Container -->
+        
+
+    <script>
+        const quizzes = {
+            'network-security': [
+                {
+                    question: "What is the primary purpose of a firewall?",
+                    options: [
+                        { text: "To block all incoming traffic", correct: false },
+                        { text: "To monitor and control incoming and outgoing network traffic", correct: true },
+                        { text: "To encrypt data", correct: false },
+                        { text: "To detect viruses", correct: false }
+                    ]
+                },
+                {
+                    question: "Which protocol is used for secure communication over a computer network?",
+                    options: [
+                        { text: "HTTP", correct: false },
+                        { text: "FTP", correct: false },
+                        { text: "HTTPS", correct: true },
+                        { text: "SMTP", correct: false }
+                    ]
+                },
+                {
+                    question: "What is a VPN used for?",
+                    options: [
+                        { text: "To increase internet speed", correct: false },
+                        { text: "To create a secure connection over the internet", correct: true },
+                        { text: "To block ads", correct: false },
+                        { text: "To monitor network traffic", correct: false }
+                    ]
+                },
+                {
+                    question: "What is the purpose of an Intrusion Detection System (IDS)?",
+                    options: [
+                        { text: "To block all network traffic", correct: false },
+                        { text: "To detect and alert on suspicious activity", correct: true },
+                        { text: "To encrypt data", correct: false },
+                        { text: "To manage user passwords", correct: false }
+                    ]
+                },
+                {
+                    question: "Which of the following is a common network attack?",
+                    options: [
+                        { text: "Phishing", correct: false },
+                        { text: "DDoS", correct: true },
+                        { text: "Encryption", correct: false },
+                        { text: "Firewall", correct: false }
+                    ]
+                }
+            ],
+            'ethical-hacking': [
+                {
+                    question: "What is the first phase of ethical hacking?",
+                    options: [
+                        { text: "Scanning", correct: false },
+                        { text: "Reconnaissance", correct: true },
+                        { text: "Exploitation", correct: false },
+                        { text: "Reporting", correct: false }
+                    ]
+                },
+                {
+                    question: "Which tool is commonly used for network scanning?",
+                    options: [
+                        { text: "Wireshark", correct: false },
+                        { text: "Nmap", correct: true },
+                        { text: "Metasploit", correct: false },
+                        { text: "Burp Suite", correct: false }
+                    ]
+                },
+                {
+                    question: "What is the purpose of a penetration test?",
+                    options: [
+                        { text: "To fix hardware issues", correct: false },
+                        { text: "To identify security vulnerabilities", correct: true },
+                        { text: "To monitor network traffic", correct: false },
+                        { text: "To encrypt data", correct: false }
+                    ]
+                },
+                {
+                    question: "What is social engineering?",
+                    options: [
+                        { text: "A type of hardware failure", correct: false },
+                        { text: "A method of manipulating people to gain access to systems", correct: true },
+                        { text: "A network protocol", correct: false },
+                        { text: "A type of encryption", correct: false }
+                    ]
+                },
+                {
+                    question: "Which of the following is a common ethical hacking tool?",
+                    options: [
+                        { text: "Microsoft Word", correct: false },
+                        { text: "Metasploit", correct: true },
+                        { text: "Excel", correct: false },
+                        { text: "PowerPoint", correct: false }
+                    ]
+                }
+            ],
+            'cryptography': [
+                {
+                    question: "What is the purpose of encryption?",
+                    options: [
+                        { text: "To compress data", correct: false },
+                        { text: "To secure data by converting it into an unreadable format", correct: true },
+                        { text: "To detect malware", correct: false },
+                        { text: "To monitor network traffic", correct: false }
+                    ]
+                },
+                {
+                    question: "Which encryption algorithm is asymmetric?",
+                    options: [
+                        { text: "AES", correct: false },
+                        { text: "RSA", correct: true },
+                        { text: "DES", correct: false },
+                        { text: "SHA-256", correct: false }
+                    ]
+                },
+                {
+                    question: "What is a public key used for?",
+                    options: [
+                        { text: "To decrypt data", correct: false },
+                        { text: "To encrypt data", correct: true },
+                        { text: "To compress data", correct: false },
+                        { text: "To delete data", correct: false }
+                    ]
+                },
+                {
+                    question: "What is a hash function?",
+                    options: [
+                        { text: "A function that encrypts data", correct: false },
+                        { text: "A function that converts data into a fixed-size string", correct: true },
+                        { text: "A function that compresses data", correct: false },
+                        { text: "A function that monitors network traffic", correct: false }
+                    ]
+                },
+                {
+                    question: "Which of the following is a symmetric encryption algorithm?",
+                    options: [
+                        { text: "RSA", correct: false },
+                        { text: "AES", correct: true },
+                        { text: "ECC", correct: false },
+                        { text: "SHA-256", correct: false }
+                    ]
+                }
+            ]
+        };
+
+        let currentQuiz = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let userAnswers = [];
+
+        function loadQuiz(topic) {
+            currentQuiz = quizzes[topic];
+            currentQuestionIndex = 0;
+            score = 0;
+            userAnswers = [];
+            renderQuiz();
+        }
+
+        function renderQuiz() {
+            const quizContainer = document.getElementById('quiz-container');
+            const quizContent = document.getElementById('quiz-content');
+            const quizTitle = document.getElementById('quiz-title');
+
+            if (currentQuiz.length === 0) {
+                quizTitle.innerText = "Select a Quiz Topic";
+                quizContent.innerHTML = "<p>Please select a topic from above to start the quiz.</p>";
+                return;
+            }
+
+            quizTitle.innerText = "Quiz: " + document.querySelector(`[onclick="loadQuiz('${Object.keys(quizzes).find(key => quizzes[key] === currentQuiz)}')"] h2`).innerText;
+
+            const question = currentQuiz[currentQuestionIndex];
+            const optionsHtml = question.options.map((option, index) => `
+                <div class="option" onclick="selectOption(${index})">
+                    ${option.text}
+                </div>
+            `).join('');
+
+            quizContent.innerHTML = `
+                <div class="question">
+                    <h3>${question.question}</h3>
+                    <div class="options">${optionsHtml}</div>
+                </div>
+                <div class="result" id="result"></div>
+                <button class="btn" onclick="nextQuestion()" id="next-btn" disabled>Next</button>
+            `;
+        }
+
+        function selectOption(index) {
+            const options = document.querySelectorAll('.option');
+            const result = document.getElementById('result');
+            const nextBtn = document.getElementById('next-btn');
+
+            options.forEach((option, i) => {
+                if (currentQuiz[currentQuestionIndex].options[i].correct) {
+                    option.classList.add('correct');
+                } else if (i === index) {
+                    option.classList.add('incorrect');
+                }
+                option.style.pointerEvents = 'none';
+            });
+
+            const isCorrect = currentQuiz[currentQuestionIndex].options[index].correct;
+            userAnswers.push({ question: currentQuiz[currentQuestionIndex].question, answer: currentQuiz[currentQuestionIndex].options[index].text, correct: isCorrect });
+
+            if (isCorrect) {
+                result.innerText = "Correct!";
+                result.classList.add('correct');
+                score++;
+            } else {
+                result.innerText = "Incorrect!";
+                result.classList.add('incorrect');
+            }
+
+            nextBtn.disabled = false;
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < currentQuiz.length) {
+                renderQuiz();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            const quizContent = document.getElementById('quiz-content');
+            quizContent.innerHTML = `
+                <h3>Quiz Completed!</h3>
+                <p>Your score: ${score} out of ${currentQuiz.length}</p>
+                <div class="final-report">
+                    <h3>Final Report</h3>
+                    <ul>
+                        ${userAnswers.map((answer, index) => `
+                            <li class="${answer.correct ? 'correct' : 'incorrect'}">
+                                <strong>Question ${index + 1}:</strong> ${answer.question}<br>
+                                <strong>Your Answer:</strong> ${answer.answer}<br>
+                                <strong>Status:</strong> ${answer.correct ? 'Correct' : 'Incorrect'}
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+                <button class="btn" onclick="loadQuiz('${Object.keys(quizzes).find(key => quizzes[key] === currentQuiz)}')">Restart Quiz</button>
+            `;
+        }
+    </script>
+</body>
+</html>
